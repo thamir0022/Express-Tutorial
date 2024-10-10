@@ -62,9 +62,13 @@ export const userSignIn = async (req, res) => {
     const { password: pass, ...rest } = user._doc;
 
     if (isValid) {
-      const token = jwt.sign({ id: user._id, isAdmin: false}, process.env.JWT_SECRET, {expiresIn: "7d"});
+      const token = jwt.sign(
+        { id: user._id, isAdmin: false },
+        process.env.JWT_SECRET,
+        { expiresIn: "7d" }
+      );
       const { password: pass, ...rest } = user._doc;
-  
+
       res
         .status(200)
         .cookie("access_token", token, {
@@ -95,14 +99,24 @@ export const adminSignIn = async (req, res) => {
         .json({ success: false, message: "User not found" });
     }
 
+    const isAdmin = user.isAdmin;
+    if (!isAdmin) {
+      return res
+        .status(404)
+        .json({ success: false, message: "You are not a admin!" });
+    }
     const isValid = await bcyrptjs.compareSync(password, user.password);
 
     const { password: pass, ...rest } = user._doc;
 
     if (isValid) {
-      const token = jwt.sign({ id: user._id, isAdmin: true}, process.env.JWT_SECRET, {expiresIn: "7d"});
+      const token = jwt.sign(
+        { id: user._id, isAdmin: true },
+        process.env.JWT_SECRET,
+        { expiresIn: "7d" }
+      );
       const { password: pass, ...rest } = user._doc;
-  
+
       res
         .status(200)
         .cookie("access_token", token, {
