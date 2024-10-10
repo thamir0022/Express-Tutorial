@@ -102,24 +102,31 @@ export const adminSignIn = async (req, res) => {
         });
     }
 
-    const isValid = await bcyrptjs.compareSync(password, admin.password);
+    const isValid = await bcyrptjs.compareSync(password, admin?.password);
 
-    if (isValid) {
-      const token = jwt.sign(
-        { id: admin._id, isAdmin: true },
-        process.env.JWT_SECRET,
-        { expiresIn: "7d" }
-      );
-
-      const { password: pass, ...rest } = admin._doc;
-
-      res
-        .status(200)
-        .cookie("access_token", token, {
-          httpOnly: true,
-        })
-        .json(rest);
+    if (!isValid) {
+      return res
+        .status(404)
+        .json({
+          success: false,
+          message: "Admin cretintials are not valid",
+        });
     }
+
+    const token = jwt.sign(
+      { id: admin._id, isAdmin: true },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    const { password: pass, ...rest } = admin._doc;
+
+    res
+      .status(200)
+      .cookie("access_token", token, {
+        httpOnly: true,
+      })
+      .json(rest);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
