@@ -91,31 +91,27 @@ export const adminSignIn = async (req, res) => {
         .json({ success: false, message: "All feilds are required" });
     }
 
-    const user = await User.findOne({ email });
+    const admin = await User.findOne({ email, isAdmin: true });
 
-    if (!user) {
+    if (!admin) {
       return res
         .status(404)
-        .json({ success: false, message: "User not found" });
+        .json({
+          success: false,
+          message: "Admin not found or wrong cretintials",
+        });
     }
 
-    const isAdmin = user.isAdmin;
-    if (!isAdmin) {
-      return res
-        .status(404)
-        .json({ success: false, message: "You are not a admin!" });
-    }
-    const isValid = await bcyrptjs.compareSync(password, user.password);
-
-    const { password: pass, ...rest } = user._doc;
+    const isValid = await bcyrptjs.compareSync(password, admin.password);
 
     if (isValid) {
       const token = jwt.sign(
-        { id: user._id, isAdmin: true },
+        { id: admin._id, isAdmin: true },
         process.env.JWT_SECRET,
         { expiresIn: "7d" }
       );
-      const { password: pass, ...rest } = user._doc;
+
+      const { password: pass, ...rest } = admin._doc;
 
       res
         .status(200)
