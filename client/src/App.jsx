@@ -1,35 +1,17 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
+import { Routes, Route } from "react-router-dom";
+import SignupPage from "../pages/SignupPage";
+import { UserProvider } from "./context/userContext";
+import LoginPage from "../pages/LoginPage";
 
 const App = () => {
-  const [products, setProducts] = useState([]);
-
-  useEffect(() => {
-    const getProducts = async () => {
-      try {
-        const res = await fetch("/api/user/products");
-        if (res.ok) {
-          const data = await res.json();
-          setProducts(data);
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    getProducts();
-  }, []);
-
   return (
-    <section>
-      {products.length > 0 ? (
-        products.map((p) => (
-          <div className="">
-            <p>{p.name}</p>
-          </div>
-        ))
-      ) : (
-        <p>No Products Available</p>
-      )}
-    </section>
+    <UserProvider>
+      <Routes>
+        <Route path="/sign-up" element={<SignupPage />} />
+        <Route path="/sign-in" element={<LoginPage />} />
+      </Routes>
+    </UserProvider>
   );
 };
 
