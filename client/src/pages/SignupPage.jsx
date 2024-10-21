@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useUser } from "../src/context/userContext";
+import { useUser } from "../context/userContext"; 
 import { useNavigate } from "react-router-dom";
 
 // Utility function for signing up a user

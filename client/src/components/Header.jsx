@@ -4,6 +4,7 @@ import { useUser } from "../context/userContext";
 
 const Header = () => {
   const { user } = useUser();
+  console.log(user)
 
   return (
     <header className="w-screen flex h-14 bg-black/25 items-center px-4 justify-between">
@@ -17,9 +18,9 @@ const Header = () => {
       </nav>
       <div className="flex justify-between">
         {user ? (
-          <span className="size-10 rounded-full flex items-center justify-center bg-blue-600 text-xl text-white font-semibold ">
-            {user && user.firstName[0]}
-          </span>
+          <Link to={'/profile'} className="size-10 rounded-full flex items-center justify-center bg-blue-600 text-xl text-white font-semibold ">
+            {user && user?.firstName[0]}
+          </Link>
         ) : (
           <Link to={'/sign-in'} className="hidden md:block">Sign In</Link>
         )}

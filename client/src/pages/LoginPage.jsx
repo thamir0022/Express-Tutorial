@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useUser } from "../src/context/userContext";
+import { useUser } from "../context/userContext";
 import { useNavigate } from "react-router-dom";
 
 // Utility function to handle the login API call
@@ -22,7 +22,7 @@ const loginUser = async (userInput) => {
 const LoginPage = () => {
   const [userInput, setUserInput] = useState({ email: "", password: "" });
   const [status, setStatus] = useState({ message: "", success: null });
-  const { user, login } = useUser();
+  const { login } = useUser();
   const navigate = useNavigate();
 
   const handleChange = (e) => {

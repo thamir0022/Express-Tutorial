@@ -4,10 +4,18 @@ import User from "../models/user.model.js";
 
 export const updateUser = async (req, res) => {
   try {
+    if(!req.params.userId){
+      return res.json({
+        success: false,
+        message: "User Id is required!",
+      });
+    }
     if (req.user.id !== req.params.userId) {
       return res.json({
         success: false,
         message: "You don't have permission to update this user.",
+        params: req.params.userId,
+        user: req.user.id
       });
     }
 

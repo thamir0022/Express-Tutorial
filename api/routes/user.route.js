@@ -6,6 +6,6 @@ const app = express();
 
 app.get("/product/:id?", getProduct);
 app.get("/products", getProducts);
-app.post("/update/:userId", verifyToken, updateUser)
+app.post("/update/:userId?", verifyToken, updateUser)
 
 export default app;
