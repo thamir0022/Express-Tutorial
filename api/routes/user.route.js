@@ -1,11 +1,11 @@
 import express from "express";
-import { getProduct, getProducts, homePage } from "../controllers/user.controller.js";
+import { getProduct, getProducts, updateUser } from "../controllers/user.controller.js";
 import { verifyToken } from "../utils/verifyUser.js";
 
 const app = express();
 
-app.get("/home", verifyToken, homePage);
 app.get("/product/:id?", getProduct);
 app.get("/products", getProducts);
+app.post("/update/:userId", verifyToken, updateUser)
 
 export default app;

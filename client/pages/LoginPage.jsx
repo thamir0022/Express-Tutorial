@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useUser } from "../src/context/userContext";
+import { useNavigate } from "react-router-dom";
 
 // Utility function to handle the login API call
 const loginUser = async (userInput) => {
@@ -22,6 +23,7 @@ const LoginPage = () => {
   const [userInput, setUserInput] = useState({ email: "", password: "" });
   const [status, setStatus] = useState({ message: "", success: null });
   const { user, login } = useUser();
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setUserInput((prevInput) => ({
@@ -43,13 +45,12 @@ const LoginPage = () => {
     try {
       const data = await loginUser(userInput);
       setStatus({ message: "Sign In Successful", success: true });
-      login(data)  // Assuming your API returns user data here
+      login(data);
+      navigate("/");
     } catch (error) {
       setStatus({ message: error.message, success: false });
     }
   };
-
-  console.log(user)
 
   return (
     <form onSubmit={handleSubmit}>

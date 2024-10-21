@@ -1,8 +1,59 @@
 import { isValidObjectId } from "mongoose";
 import Product from "../models/product.model.js";
+import User from "../models/user.model.js";
 
-export const homePage = (req, res) => {
-  res.send(req.user);
+export const updateUser = async (req, res) => {
+  try {
+    if (req.user.id !== req.params.userId) {
+      return res.json({
+        success: false,
+        message: "You don't have permission to update this user.",
+      });
+    }
+
+    const { firstName, lastName, email, password } = req.body;
+    if (firstName?.length > 10 || lastName?.length > 10) {
+      return res.json({
+        success: false,
+        message: "First name and last name should under 10 characters!",
+      });
+    }
+
+    if (password?.length < 6) {
+      return res.json({
+        success: false,
+        message: "Password must between 6 to 12 characters long!",
+      });
+    }
+
+    if (password?.includes(" ")) {
+      return res.json({
+        success: false,
+        message: "Password should not contain spaces",
+      });
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      req.params.userId,
+      {
+        $set: {
+          firstName,
+          lastName,
+          email,
+          password,
+        },
+      },
+      { new: true }
+    );
+
+    res.json({
+      success: true,
+      message: "User updated successfully",
+      updatedUser,
+    });
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 export const getProduct = async (req, res) => {
