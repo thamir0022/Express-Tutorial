@@ -1,25 +1,21 @@
 import User from "../models/user.model.js";
 import bcyrptjs from "bcryptjs";
 import jwt from "jsonwebtoken";
+import { isValidObjectId } from "mongoose";
+import { errorHandler } from "../utils/error.js";
 
-export const userSignUp = async (req, res) => {
+export const userSignUp = async (req, res, next) => {
   try {
     const { firstName, lastName, email, password } = req.body;
 
     if (!firstName || !lastName || !email || !password) {
-      return res.status(400).json({
-        success: false,
-        message: "Please enter all required fields",
-      });
+      return next(errorHandler(400, "Please enter all required fields"));
     }
 
     const excistingUser = await User.findOne({ email });
 
     if (excistingUser) {
-      return res.json({
-        success: false,
-        message: "User already exists",
-      });
+      return next(errorHandler(400, "User already exists"));
     }
 
     const hashedPassword = await bcyrptjs.hashSync(password, 10);
@@ -35,26 +31,22 @@ export const userSignUp = async (req, res) => {
 
     res.status(201).json({ success: true, message: "SignUp Success", newUser });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    return next(errorHandler(400, error.message));
   }
 };
 
-export const userSignIn = async (req, res) => {
+export const userSignIn = async (req, res, next) => {
   try {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      return res
-        .status(400)
-        .json({ success: false, message: "All feilds are required" });
+      return next(errorHandler(400, "Email and password are required!"))
     }
 
     const user = await User.findOne({ email });
 
     if (!user) {
-      return res
-        .status(404)
-        .json({ success: false, message: "User not found" });
+      return next(errorHandler(404, "User not found")); 
     }
 
     const isValid = await bcyrptjs.compareSync(password, user.password);
@@ -138,5 +130,31 @@ export const signOut = (req, res) => {
     return res.status(200).json({ message: "Sign Out Success" });
   } catch (error) {
     res.status(500).json({ error: error.message });
+  }
+};
+
+export const deleteAccount = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    if (!userId) {
+      return res.json({ success: false, message: "User Id is required" });
+    }
+
+    if (!isValidObjectId(userId)) {
+      return res.json({ success: false, message: "User Id is invalid" });
+    }
+
+    if (req.user.id !== userId) {
+      return res.json({
+        success: false,
+        message: "You don't have permission to delete this user.",
+      });
+    }
+
+    await User.findByIdAndDelete(userId);
+    return res.json({ success: true, message: "Account Deleted!" });
+  } catch (error) {
+    console.log(error);
   }
 };
